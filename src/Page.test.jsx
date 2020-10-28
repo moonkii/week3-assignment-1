@@ -1,41 +1,39 @@
 import React from 'react';
 
-import { render } from '@testing-library/react';
+import { render, fireEvent } from '@testing-library/react';
 
 import Page from './Page';
 
-describe('Page', () => {
+test('Page', () => {
+  const tasks = [
+    {
+      id: 1,
+      title: 'Task-1',
+    },
+    {
+      id: 2,
+      title: 'Task-2',
+    },
+  ];
+
   const handleChange = jest.fn();
   const handleClickAddTask = jest.fn();
   const handleClickDeleteTask = jest.fn();
 
-  const tasks = [
-    {
-      id: 1,
-      title: 'task#1',
-    },
-    {
-      id: 2,
-      title: 'task#2',
-    },
-  ];
+  const { getByText } = render((
+    <Page
+      taskTitle=""
+      onChangeTitle={handleChange}
+      onClickAddTask={handleClickAddTask}
+      tasks={tasks}
+      onClickDeleteTask={handleClickDeleteTask}
+    />
+  ));
 
-  beforeEach(() => {
-    handleChange.mockClear();
-    handleClickAddTask.mockClear();
-  });
+  expect(getByText(/Task-1/)).not.toBeNull();
+  expect(getByText(/Task-2/)).not.toBeNull();
 
-  it('renders title', () => {
-    const { container } = render((
-      <Page
-        taskTitle=""
-        onChangeTitle={handleChange}
-        onClickAddTask={handleClickAddTask}
-        tasks={tasks}
-        onClickDeleteTask={handleClickDeleteTask}
-      />
-    ));
+  fireEvent.click(getByText('추가'));
 
-    expect(container).toHaveTextContent('To-do');
-  });
+  expect(handleClickAddTask).toBeCalled();
 });

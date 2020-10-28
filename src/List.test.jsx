@@ -5,50 +5,58 @@ import { render, fireEvent } from '@testing-library/react';
 import List from './List';
 
 describe('List', () => {
-  const handleClick = jest.fn();
+  const handleClickDelete = jest.fn();
 
-  given('tasks', () => [
-    {
-      id: 1,
-      title: '무언가 하기',
-    },
-  ]);
-
-  beforeEach(() => {
-    handleClick.mockClear();
-  });
-
-  function renderList() {
+  function renderList(tasks) {
     return render((
       <List
-        tasks={given.tasks}
-        onClickDelete={handleClick}
+        tasks={tasks}
+        onClickDelete={handleClickDelete}
       />
     ));
   }
-
   context('with tasks', () => {
-    it('renders title of todos', () => {
-      const { container } = renderList();
+    const tasks = [
+      {
+        id: 1,
+        title: 'Task-1',
+      },
+      {
+        id: 2,
+        title: 'Task-2',
+      },
+    ];
 
-      expect(container).toHaveTextContent('무언가 하기');
+    it('renders tasks', () => {
+      const { getByText } = renderList(tasks);
+
+      expect(getByText(/Task-1/)).not.toBeNull();
+      expect(getByText(/Task-2/)).not.toBeNull();
     });
 
-    it('listens click event', () => {
-      const { getByText } = renderList();
+    it('renders “완료” button to delete task', () => {
+      const { getAllByText } = render((
+        <List
+          tasks={tasks}
+          onClickDelete={handleClickDelete}
+        />
+      ));
 
-      fireEvent.click(getByText('완료'));
+      const buttons = getAllByText('완료');
 
-      expect(handleClick).toBeCalled();
+      fireEvent.click(buttons[0]);
+
+      expect(handleClickDelete).toBeCalled();
     });
   });
 
   context('without tasks', () => {
-    given('tasks', () => []);
-    it('renders message', () => {
-      const { container } = renderList();
+    const tasks = [];
 
-      expect(container).toHaveTextContent('할 일이 없어요!');
+    it('renders no task message', () => {
+      const { getByText } = renderList(tasks);
+
+      expect(getByText(/할 일이 없어요!/)).not.toBeNull();
     });
   });
 });
