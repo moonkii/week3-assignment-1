@@ -12,6 +12,7 @@ module.exports = {
     Atomics: 'readonly',
     SharedArrayBuffer: 'readonly',
     context: 'readonly',
+    given: 'readonly',
     Feature: 'readonly',
     Scenario: 'readonly',
     actor: 'readonly',
