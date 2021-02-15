@@ -5,41 +5,46 @@ import { render, fireEvent } from '@testing-library/react';
 import Input from './Input';
 
 describe('Input', () => {
-  const handleChange = jest.fn();
-  const handleClick = jest.fn();
-
   beforeEach(() => {
-    handleChange.mockClear();
-    handleClick.mockClear();
+    jest.clearAllMocks();
   });
 
-  function renderInput() {
-    return render((
-      <Input
-        value=""
-        onChange={handleChange}
-        onClick={handleClick}
-      />
-    ));
-  }
+  const value = '';
 
-  it('renders label text', () => {
-    const { queryByLabelText } = renderInput();
+  const handleChangeInput = jest.fn();
+  const handleClickAddTask = jest.fn();
 
-    expect(queryByLabelText('할 일')).not.toBeNull();
+  const renderInput = () => render((
+    <Input
+      value={value}
+      onChange={handleChangeInput}
+      onClick={handleClickAddTask}
+    />
+  ));
+
+  context('without value', () => {
+    it('renders placeholder', () => {
+      const { getByLabelText } = renderInput();
+
+      expect(getByLabelText('할 일')).toBeInTheDocument();
+    });
   });
 
-  it('listens change and click event', () => {
-    const { getByLabelText, getByText } = renderInput();
+  context('with value', () => {
+    it('listens change event', () => {
+      const { getByLabelText } = renderInput();
 
-    fireEvent.change(getByLabelText('할 일'), {
-      target: { value: '아무 일이나 하자' },
+      fireEvent.change(getByLabelText('할 일'), { target: { value: '홈트하기' } });
+
+      expect(handleChangeInput).toBeCalled();
     });
 
-    expect(handleChange).toBeCalled();
+    it('listens "추가" button click event', () => {
+      const { getByText } = renderInput();
 
-    fireEvent.click(getByText('추가'));
+      fireEvent.click(getByText('추가'));
 
-    expect(handleClick).toBeCalled();
+      expect(handleClickAddTask).toBeCalled();
+    });
   });
 });
